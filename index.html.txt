@@ -1,0 +1,2510 @@
+<!doctype html>
+<html lang="uk">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Бібліотека електронних наочностей: Криві другого порядку</title>
+
+  <!-- MathJax for formulas -->
+  <script>
+    window.MathJax = {
+      tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]']] },
+      svg: { fontCache: 'global' }
+    };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
+  <style>
+    :root{
+      --bg:#f8fafc;
+      --surface:#ffffff;
+      --surface-2:#f9fbfe;
+      --card:#ffffff;
+      --text:#0f172a;
+      --heading:#0b1220;
+      --muted:#667085;
+      --accent:#1677ff;
+      --accent-dark:#0f5ed7;
+      --accent-soft:#eaf3ff;
+      --accent2:#16a34a;
+      --warn:#f97316;
+      --danger:#ef4444;
+      --border:#e3e8ef;
+      --border-strong:#d7dee8;
+      --shadow:0 10px 28px rgba(15,23,42,.055);
+      --shadow-soft:0 8px 18px rgba(15,23,42,.045);
+      --r:16px;
+      --pad:18px;
+      --mono:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --sans:Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Helvetica, Arial;
+    }
+
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0;
+      font-family:var(--sans);
+      color:var(--text);
+      background:linear-gradient(180deg,#ffffff 0%,#f7f9fc 42%,var(--bg) 100%);
+      min-height:100vh;
+    }
+    body::before{display:none}
+
+    header{
+      position:sticky; top:0; z-index:10;
+      background:rgba(255,255,255,.96);
+      backdrop-filter:blur(16px);
+      border-bottom:1px solid var(--border);
+      box-shadow:0 1px 0 rgba(15,23,42,.03);
+    }
+    .wrap{max-width:1480px; margin:0 auto; padding:22px 36px;}
+    .top{
+      display:grid;
+      grid-template-columns:minmax(420px, 1fr) auto;
+      gap:28px;
+      align-items:center;
+    }
+    @media (max-width:1050px){
+      .wrap{padding:18px 22px}
+      .top{grid-template-columns:1fr; gap:16px}
+    }
+
+    .brand{display:block; min-width:0}
+    .logo,.brand::before,.eyebrow{display:none!important}
+    h1{
+      margin:0;
+      color:var(--heading);
+      font-size:clamp(23px,2.1vw,30px);
+      line-height:1.16;
+      font-weight:800;
+      letter-spacing:-.035em;
+    }
+    .sub{
+      color:var(--muted);
+      font-size:15.5px;
+      margin-top:10px;
+      line-height:1.45;
+    }
+
+    .tabs{
+      display:flex;
+      gap:14px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+      padding:0;
+      border:0;
+      background:transparent;
+      box-shadow:none;
+    }
+    @media (max-width:1050px){.tabs{justify-content:flex-start; gap:10px}}
+    .tabbtn{
+      appearance:none;
+      min-height:46px;
+      border:1px solid var(--border-strong);
+      background:#fff;
+      color:#475467;
+      padding:0 18px;
+      border-radius:10px;
+      cursor:pointer;
+      font-size:14px;
+      font-weight:650;
+      line-height:1;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      transition:background .16s ease, color .16s ease, box-shadow .16s ease, border-color .16s ease, transform .16s ease;
+      box-shadow:0 1px 2px rgba(16,24,40,.04);
+    }
+    .tabbtn::before{font-size:17px; line-height:1; color:#667085; font-weight:500}
+    .tabbtn[data-tab="circle"]::before{content:"○"}
+    .tabbtn[data-tab="ellipse"]::before{content:"∿"}
+    .tabbtn[data-tab="hyperbola"]::before{content:"⌒"}
+    .tabbtn[data-tab="parabola"]::before{content:"⌁"}
+    .tabbtn[data-tab="elements"]::before{content:"⊞"}
+    .tabbtn[data-tab="optics"]::before{content:"◉"}
+    .tabbtn[data-tab="general"]::before{content:"⊡"}
+    .tabbtn:hover{border-color:#b9c6d8; color:#1d2939; background:#fbfdff; box-shadow:0 4px 12px rgba(16,24,40,.06)}
+    .tabbtn[aria-selected="true"]{
+      color:var(--accent);
+      border-color:var(--accent);
+      background:#fff;
+      box-shadow:0 0 0 3px rgba(22,119,255,.10), 0 4px 14px rgba(22,119,255,.10);
+    }
+    .tabbtn[aria-selected="true"]::before{color:var(--accent)}
+
+    main{padding:26px 0 34px}
+    .hero{display:none!important}
+
+    .grid{
+      display:grid;
+      grid-template-columns:minmax(0, 1.48fr) minmax(420px, .98fr);
+      gap:22px;
+      align-items:start;
+    }
+    @media (max-width:1060px){.grid{grid-template-columns:1fr}}
+    .card{
+      background:var(--card);
+      border:1px solid var(--border);
+      border-radius:14px;
+      box-shadow:var(--shadow);
+      overflow:hidden;
+      position:relative;
+    }
+    .card::before{display:none}
+    .card .hd{
+      padding:24px 24px 14px;
+      border-bottom:0;
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:16px;
+      background:#fff;
+    }
+    .title{
+      font-size:22px;
+      line-height:1.25;
+      margin:0;
+      color:var(--heading);
+      font-weight:780;
+      letter-spacing:-.025em;
+    }
+    .hint{color:var(--muted); font-size:15px; line-height:1.45; margin-top:8px}
+    .card .bd{padding:0 22px 22px}
+
+    canvas{
+      width:100%;
+      height:590px;
+      display:block;
+      background:#ffffff;
+      border:1px solid var(--border-strong);
+      border-radius:9px;
+      box-shadow:none;
+    }
+    @media (max-width:760px){canvas{height:430px}}
+
+    .controls{display:grid; grid-template-columns:1fr 1fr; gap:16px}
+    .controls.one{grid-template-columns:1fr}
+    @media (max-width:620px){.controls{grid-template-columns:1fr}}
+    .ctrl{
+      border:1px solid var(--border);
+      background:#fff;
+      border-radius:10px;
+      padding:18px 16px;
+      box-shadow:0 1px 2px rgba(16,24,40,.035);
+    }
+    .ctrl label{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+      font-size:15px;
+      text-transform:none;
+      letter-spacing:0;
+      font-weight:700;
+      color:#1d2939;
+      margin-bottom:14px;
+    }
+    .ctrl input[type="range"]{
+      width:100%;
+      accent-color:var(--accent);
+      padding:0;
+      border:none;
+      background:transparent;
+      cursor:pointer;
+    }
+    .ctrl input[type="number"], .ctrl select, .ctrl textarea{
+      width:100%;
+      color:var(--text);
+      background:#fff;
+      border:1px solid var(--border-strong);
+      border-radius:8px;
+      padding:12px 13px;
+      outline:none;
+      font-family:var(--sans);
+      font-size:15px;
+      transition:border-color .16s ease, box-shadow .16s ease;
+      box-shadow:0 1px 2px rgba(16,24,40,.03);
+    }
+    .ctrl select{cursor:pointer}
+    .ctrl input[type="number"]:focus, .ctrl select:focus, .ctrl textarea:focus{
+      border-color:var(--accent);
+      box-shadow:0 0 0 3px rgba(22,119,255,.12);
+    }
+    .row{display:flex; gap:10px; flex-wrap:wrap; align-items:center}
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      gap:4px;
+      font-size:13px;
+      padding:6px 10px;
+      border-radius:999px;
+      border:1px solid var(--border);
+      background:#f8fafc;
+      color:var(--muted);
+      white-space:nowrap;
+    }
+    .pill strong{color:var(--accent); font-weight:800}
+    .kpi{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px}
+    @media (max-width:620px){.kpi{grid-template-columns:1fr}}
+    .kpi .pill{
+      width:100%;
+      justify-content:center;
+      flex-direction:column;
+      gap:6px;
+      min-height:72px;
+      border-radius:8px;
+      padding:12px 14px;
+      background:#fff;
+      color:#1d2939;
+      text-align:center;
+      font-weight:650;
+      box-shadow:0 1px 2px rgba(16,24,40,.035);
+    }
+    .kpi .pill strong{font-size:17px}
+    .btn{
+      cursor:pointer;
+      border:1px solid var(--border-strong);
+      background:#fff;
+      color:#1d2939;
+      padding:11px 16px;
+      border-radius:8px;
+      box-shadow:0 1px 2px rgba(16,24,40,.04);
+      transition:transform .15s ease, box-shadow .15s ease, background .15s ease, color .15s ease, border-color .15s ease;
+      font-size:14px;
+      font-weight:700;
+    }
+    .btn:hover{transform:translateY(-1px); border-color:#b8c4d4; background:#f9fbff; box-shadow:0 4px 12px rgba(16,24,40,.07)}
+    .btn.primary{border-color:var(--accent); background:var(--accent); color:#fff}
+    .btn.danger{border-color:#fecaca; background:#fff; color:#dc2626}
+    .btn.danger:hover{background:#fff5f5; border-color:#fca5a5; color:#b91c1c}
+    .formula{
+      margin-top:16px;
+      padding:18px;
+      border-radius:10px;
+      border:1px solid var(--border);
+      background:#fff;
+      overflow:auto;
+      color:#0f172a;
+      box-shadow:0 1px 2px rgba(16,24,40,.035);
+    }
+    .small{font-size:14px; color:var(--muted); line-height:1.55; margin-top:14px}
+    .section{display:none; animation:fadeIn .18s ease}
+    .section.active{display:block}
+    @keyframes fadeIn{from{opacity:.5; transform:translateY(3px)} to{opacity:1; transform:none}}
+    .footer{
+      color:var(--muted);
+      font-size:14px;
+      line-height:1.55;
+      padding:16px 0 0;
+      border-top:1px solid var(--border);
+      margin-top:18px;
+    }
+    .tabbtn:focus-visible, .btn:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible{outline:3px solid rgba(22,119,255,.18); outline-offset:2px}
+    ::selection{background:#d8ebff; color:#0f172a}
+  
+
+/* ===== Professional educational dashboard upgrade ===== */
+:root{
+  --blue:#1677ff;
+  --orange:#f97316;
+  --green:#16a34a;
+  --purple:#7c3aed;
+  --teal:#0d9488;
+  --slate:#64748b;
+  --ink:#101828;
+}
+body{
+  background:
+    radial-gradient(900px 360px at 8% -10%, rgba(22,119,255,.10), transparent 60%),
+    radial-gradient(720px 320px at 100% 0%, rgba(22,163,74,.07), transparent 55%),
+    linear-gradient(180deg,#ffffff 0%,#f7f9fc 46%,#f3f6fb 100%) !important;
+}
+header{
+  box-shadow:0 10px 30px rgba(16,24,40,.045) !important;
+}
+.wrap{max-width:1500px !important;}
+.brand h1{font-weight:850 !important; letter-spacing:-.04em !important;}
+.brand h1::before{
+  content:"";
+  display:inline-block;
+  width:10px;
+  height:10px;
+  margin-right:10px;
+  border-radius:999px;
+  background:var(--blue);
+  box-shadow:0 0 0 6px rgba(22,119,255,.10);
+  vertical-align:middle;
+}
+.sub{max-width:650px;}
+.tabs{
+  padding:6px !important;
+  border:1px solid var(--border) !important;
+  background:rgba(255,255,255,.86) !important;
+  border-radius:16px !important;
+  box-shadow:0 10px 24px rgba(16,24,40,.055) !important;
+}
+.tabbtn{
+  border-radius:11px !important;
+  min-height:42px !important;
+  padding:0 15px !important;
+  box-shadow:none !important;
+}
+.tabbtn[aria-selected="true"]{
+  color:#fff !important;
+  background:linear-gradient(180deg,#2185ff,#0f6be8) !important;
+  box-shadow:0 10px 20px rgba(22,119,255,.22) !important;
+}
+.tabbtn[aria-selected="true"]::before{color:#fff !important;}
+.hero{
+  display:block !important;
+  margin-bottom:22px;
+  border:1px solid var(--border);
+  border-radius:18px;
+  background:linear-gradient(135deg,#ffffff 0%,#f8fbff 70%,#eef6ff 100%);
+  box-shadow:var(--shadow);
+  overflow:hidden;
+}
+.hero-inner{
+  padding:18px 22px;
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  gap:16px;
+  align-items:center;
+}
+.hero-title{margin:0 0 6px; font-size:17px; font-weight:820; color:var(--heading);}
+.hero-text{margin:0; color:var(--muted); font-size:14px; line-height:1.5;}
+.hero-badges{display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end;}
+.badge{display:inline-flex;align-items:center;gap:8px;border:1px solid #d7e7ff;background:#fff;color:#175cd3;border-radius:999px;padding:8px 11px;font-size:12.5px;font-weight:750;}
+.badge::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--blue);}
+@media(max-width:900px){.hero-inner{grid-template-columns:1fr}.hero-badges{justify-content:flex-start}}
+.section-meta{
+  display:grid;
+  grid-template-columns:1.1fr .9fr .9fr;
+  gap:12px;
+  margin:0 0 16px;
+}
+@media(max-width:980px){.section-meta{grid-template-columns:1fr}}
+.guide-card{
+  border:1px solid var(--border);
+  border-radius:14px;
+  background:rgba(255,255,255,.92);
+  box-shadow:0 5px 16px rgba(16,24,40,.04);
+  padding:14px 16px;
+}
+.guide-label{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  font-size:12px;
+  font-weight:800;
+  color:#475467;
+  text-transform:uppercase;
+  letter-spacing:.055em;
+  margin-bottom:6px;
+}
+.guide-label::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--guide-color,var(--blue));}
+.guide-card strong{font-size:15px;color:var(--heading)}
+.guide-card p{margin:5px 0 0;color:var(--muted);font-size:13.5px;line-height:1.45}
+.card{
+  border-radius:18px !important;
+  box-shadow:0 14px 34px rgba(16,24,40,.07) !important;
+}
+.card .hd{
+  padding:22px 24px 16px !important;
+  border-bottom:1px solid #eef2f6 !important;
+  background:linear-gradient(180deg,#fff,#fbfcfe) !important;
+}
+.title{font-size:20px !important;}
+.hint{font-size:14px !important;}
+.card .bd{padding:20px 22px 22px !important;}
+canvas{
+  height:560px !important;
+  border-radius:14px !important;
+  background:
+    linear-gradient(rgba(255,255,255,.88),rgba(255,255,255,.88)),
+    radial-gradient(circle at 50% 50%, rgba(22,119,255,.05), transparent 58%) !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.95), 0 8px 18px rgba(16,24,40,.035) !important;
+}
+.canvas-note{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin-top:12px;
+  padding:10px 12px;
+  border:1px solid #e6edf5;
+  border-radius:12px;
+  background:#fbfdff;
+  color:#667085;
+  font-size:13px;
+}
+.legend-mini{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.legend-item{display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.legend-dot{width:9px;height:9px;border-radius:50%;background:var(--blue)}
+.legend-dot.orange{background:var(--orange)}
+.legend-dot.green{background:var(--green)}
+.legend-dot.gray{background:#98a2b3}
+.ctrl{
+  position:relative;
+  border-radius:14px !important;
+  padding:16px !important;
+  background:linear-gradient(180deg,#fff,#fbfcfe) !important;
+}
+.ctrl::before{
+  content:"";
+  position:absolute;
+  left:0; top:12px; bottom:12px;
+  width:3px;
+  border-radius:0 99px 99px 0;
+  background:var(--ctrl-color,var(--blue));
+  opacity:.85;
+}
+.ctrl label{font-size:14px !important; margin-left:4px;}
+.ctrl .range-caption,
+.range-caption{
+  display:flex;
+  justify-content:space-between;
+  color:#98a2b3;
+  font-size:12px;
+  margin-top:7px;
+}
+input[type="range"]{accent-color:var(--ctrl-color,var(--blue)) !important;}
+#circleR,#ellA,#hypA,#gScale{--ctrl-color:var(--blue)}
+#circleScale,#parScale,#opScale,#ellScale,#hypScale,#elScale{--ctrl-color:var(--slate)}
+#ellB,#elB{--ctrl-color:var(--orange)}
+#hypB,#opMode{--ctrl-color:var(--teal)}
+#parP,#opP,#elA{--ctrl-color:var(--green)}
+#opRays{--ctrl-color:var(--purple)}
+#gA,#gB,#gC,#gD,#gE,#gF{--ctrl-color:var(--purple)}
+.ctrl:has(#circleR),.ctrl:has(#ellA),.ctrl:has(#hypA),.ctrl:has(#gScale){--ctrl-color:var(--blue)}
+.ctrl:has(#circleScale),.ctrl:has(#parScale),.ctrl:has(#opScale),.ctrl:has(#ellScale),.ctrl:has(#hypScale),.ctrl:has(#elScale){--ctrl-color:var(--slate)}
+.ctrl:has(#ellB),.ctrl:has(#elB){--ctrl-color:var(--orange)}
+.ctrl:has(#hypB),.ctrl:has(#opMode){--ctrl-color:var(--teal)}
+.ctrl:has(#parP),.ctrl:has(#opP),.ctrl:has(#elA){--ctrl-color:var(--green)}
+.ctrl:has(#opRays){--ctrl-color:var(--purple)}
+.kpi .pill{
+  min-height:78px !important;
+  background:linear-gradient(180deg,#ffffff,#fbfdff) !important;
+  border-radius:12px !important;
+}
+.kpi .pill:nth-child(1){border-color:#cfe3ff;background:linear-gradient(180deg,#fff,#f2f7ff) !important;}
+.kpi .pill:nth-child(2){border-color:#d8f3df;background:linear-gradient(180deg,#fff,#f3fbf5) !important;}
+.formula{
+  border-radius:14px !important;
+  background:linear-gradient(180deg,#fff,#f7fbff) !important;
+  border-color:#d8e8ff !important;
+}
+.formula::before{
+  content:"Канонічний запис";
+  display:block;
+  margin-bottom:8px;
+  color:#175cd3;
+  font-size:12px;
+  font-weight:850;
+  text-transform:uppercase;
+  letter-spacing:.06em;
+}
+.btn{border-radius:10px !important;}
+.btn:not(.danger):hover{border-color:#9ec5ff !important;color:#0f5ed7 !important;background:#f4f9ff !important;}
+.pro-tip{
+  margin-top:14px;
+  padding:13px 14px;
+  border:1px solid #e3e8ef;
+  border-radius:13px;
+  background:linear-gradient(180deg,#fff,#fbfcfe);
+  color:#667085;
+  font-size:13.5px;
+  line-height:1.48;
+}
+.pro-tip strong{color:#344054}
+.footer{background:#fbfcfe;border-radius:12px;border:1px solid #eef2f6 !important;padding:13px 14px !important;}
+
+  
+
+    /* === Final mobile optimization + clean tab buttons === */
+    .hero{display:none!important;}
+
+    header{
+      position:sticky;
+      top:0;
+      z-index:20;
+    }
+
+    .wrap{
+      width:min(100%, 1240px);
+      padding-left:clamp(12px, 3vw, 24px);
+      padding-right:clamp(12px, 3vw, 24px);
+    }
+
+    .top{
+      grid-template-columns:minmax(0,1fr) auto;
+      gap:18px;
+      align-items:center;
+    }
+
+    .brand::before{display:none!important;}
+    .eyebrow{display:none!important;}
+
+    .tabs{
+      display:flex!important;
+      align-items:center!important;
+      justify-content:flex-end!important;
+      gap:12px!important;
+      padding:0!important;
+      border:0!important;
+      background:transparent!important;
+      box-shadow:none!important;
+      border-radius:0!important;
+      max-width:100%;
+    }
+
+    .tabbtn{
+      min-height:44px!important;
+      padding:0 18px!important;
+      border-radius:9px!important;
+      border:1px solid #d7dee8!important;
+      background:#ffffff!important;
+      color:#536176!important;
+      box-shadow:0 1px 2px rgba(16,24,40,.05)!important;
+      font-size:14px!important;
+      font-weight:650!important;
+      gap:9px!important;
+      white-space:nowrap!important;
+      transform:none!important;
+    }
+
+    .tabbtn::before{
+      color:#7b8798!important;
+      font-size:17px!important;
+      font-weight:500!important;
+    }
+    .tabbtn[data-tab="circle"]::before{content:"○";}
+    .tabbtn[data-tab="ellipse"]::before{content:"⌁";}
+    .tabbtn[data-tab="hyperbola"]::before{content:"⌒";}
+    .tabbtn[data-tab="parabola"]::before{content:"↗";}
+    .tabbtn[data-tab="elements"]::before{content:"⊞";}
+    .tabbtn[data-tab="optics"]::before{content:"◉";}
+    .tabbtn[data-tab="general"]::before{content:"▣";}
+
+    .tabbtn:hover{
+      border-color:#b8c4d4!important;
+      color:#1f2937!important;
+      background:#fbfdff!important;
+      box-shadow:0 4px 12px rgba(16,24,40,.07)!important;
+    }
+
+    .tabbtn[aria-selected="true"]{
+      color:#0d6efd!important;
+      border-color:#0d6efd!important;
+      background:#ffffff!important;
+      box-shadow:0 0 0 3px rgba(13,110,253,.10), 0 3px 10px rgba(13,110,253,.10)!important;
+    }
+    .tabbtn[aria-selected="true"]::before{color:#0d6efd!important;}
+
+    main{padding-top:20px!important;}
+
+    @media (max-width:1100px){
+      .top{grid-template-columns:1fr!important;}
+      .tabs{
+        justify-content:flex-start!important;
+        overflow-x:auto!important;
+        flex-wrap:nowrap!important;
+        padding-bottom:4px!important;
+        scrollbar-width:thin;
+        -webkit-overflow-scrolling:touch;
+      }
+      .tabbtn{flex:0 0 auto!important;}
+    }
+
+    @media (max-width:760px){
+      body{background:#f7f9fc!important;}
+      header{position:static!important;}
+      .wrap{padding:14px 12px!important;}
+      .top{gap:12px!important;}
+      h1{font-size:20px!important; line-height:1.18!important; letter-spacing:-.02em!important;}
+      .sub{font-size:13px!important; margin-top:6px!important;}
+      .tabs{gap:8px!important; margin-left:-2px; margin-right:-2px;}
+      .tabbtn{min-height:40px!important; padding:0 13px!important; font-size:12.5px!important; border-radius:8px!important;}
+      .tabbtn::before{font-size:15px!important;}
+      main{padding-top:8px!important; padding-bottom:24px!important;}
+      .grid{grid-template-columns:1fr!important; gap:14px!important;}
+      .card{border-radius:14px!important; box-shadow:0 8px 22px rgba(16,24,40,.06)!important;}
+      .card .hd{padding:15px 15px 12px!important; flex-direction:column!important;}
+      .card .bd{padding:14px!important;}
+      .title{font-size:15px!important;}
+      .hint{font-size:12.5px!important;}
+      canvas{height:310px!important; border-radius:12px!important;}
+      .controls,.controls.one{grid-template-columns:1fr!important; gap:10px!important;}
+      .ctrl{padding:12px!important; border-radius:12px!important;}
+      .row{gap:8px!important;}
+      .btn{width:100%; justify-content:center; min-height:40px;}
+      .kpi{grid-template-columns:1fr!important;}
+      .formula{font-size:14px!important; padding:12px!important; border-radius:12px!important;}
+      .section-meta{display:none!important;}
+    }
+
+    @media (max-width:420px){
+      h1{font-size:18px!important;}
+      .sub{font-size:12.5px!important;}
+      canvas{height:270px!important;}
+      .tabbtn{font-size:12px!important; padding:0 11px!important;}
+    }
+
+  
+
+/* === Slide-out header/navigation + stronger phone optimization === */
+.nav-toggle{display:none;}
+@media (max-width:760px){
+  header{position:sticky!important; top:0!important; z-index:50!important;}
+  .top{
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr) 44px!important;
+    align-items:center!important;
+    gap:10px!important;
+  }
+  .brand{min-width:0!important;}
+  h1{
+    display:-webkit-box!important;
+    -webkit-line-clamp:2!important;
+    -webkit-box-orient:vertical!important;
+    overflow:hidden!important;
+  }
+  .sub{display:none!important;}
+  .nav-toggle{
+    display:inline-flex!important;
+    width:42px!important;
+    height:42px!important;
+    border:1px solid #d7dee8!important;
+    border-radius:10px!important;
+    background:#fff!important;
+    box-shadow:0 2px 8px rgba(16,24,40,.06)!important;
+    align-items:center!important;
+    justify-content:center!important;
+    flex-direction:column!important;
+    gap:4px!important;
+    cursor:pointer!important;
+    padding:0!important;
+    grid-column:2!important;
+    grid-row:1!important;
+  }
+  .nav-toggle span{
+    display:block!important;
+    width:18px!important;
+    height:2px!important;
+    border-radius:999px!important;
+    background:#344054!important;
+    transition:transform .18s ease, opacity .18s ease!important;
+  }
+  body.nav-open .nav-toggle span:nth-child(1){transform:translateY(6px) rotate(45deg)!important;}
+  body.nav-open .nav-toggle span:nth-child(2){opacity:0!important;}
+  body.nav-open .nav-toggle span:nth-child(3){transform:translateY(-6px) rotate(-45deg)!important;}
+  .tabs{
+    grid-column:1 / -1!important;
+    display:grid!important;
+    grid-template-columns:1fr 1fr!important;
+    gap:8px!important;
+    overflow:hidden!important;
+    max-height:0!important;
+    opacity:0!important;
+    margin:0!important;
+    padding:0!important;
+    border:0!important;
+    transform:translateY(-6px)!important;
+    transition:max-height .24s ease, opacity .18s ease, transform .24s ease, padding .24s ease!important;
+    scrollbar-width:none!important;
+  }
+  .tabs::-webkit-scrollbar{display:none!important;}
+  body.nav-open .tabs{
+    max-height:280px!important;
+    opacity:1!important;
+    transform:translateY(0)!important;
+    padding-top:10px!important;
+  }
+  .tabbtn{
+    width:100%!important;
+    min-height:42px!important;
+    justify-content:center!important;
+    padding:0 10px!important;
+    font-size:12px!important;
+    white-space:normal!important;
+  }
+  main.wrap{padding-top:12px!important;}
+  .card .hd{gap:6px!important;}
+  .pill{font-size:11.5px!important; padding:5px 8px!important;}
+  .ctrl label{font-size:12.5px!important; margin-bottom:10px!important;}
+  .ctrl input[type="number"], .ctrl select, .ctrl textarea{min-height:40px!important; font-size:14px!important;}
+  .ctrl input[type="range"]{height:28px!important;}
+  canvas{height:min(70vw,330px)!important; max-height:330px!important;}
+  .formula mjx-container{font-size:96%!important;}
+}
+@media (max-width:380px){
+  .tabs{grid-template-columns:1fr!important;}
+  body.nav-open .tabs{max-height:440px!important;}
+  canvas{height:250px!important;}
+  .wrap{padding-left:10px!important; padding-right:10px!important;}
+}
+
+  
+/* === Desktop slide-out navigation === */
+@media (min-width:761px){
+  .top{
+    grid-template-columns:minmax(0,1fr) 52px !important;
+  }
+
+  .nav-toggle{
+    display:inline-flex !important;
+    width:48px !important;
+    height:48px !important;
+    border:1px solid #d7dee8 !important;
+    border-radius:12px !important;
+    background:#fff !important;
+    box-shadow:0 4px 14px rgba(16,24,40,.08) !important;
+    align-items:center !important;
+    justify-content:center !important;
+    flex-direction:column !important;
+    gap:5px !important;
+    cursor:pointer !important;
+    padding:0 !important;
+  }
+
+  .nav-toggle span{
+    display:block !important;
+    width:20px !important;
+    height:2px !important;
+    border-radius:999px !important;
+    background:#344054 !important;
+    transition:transform .18s ease, opacity .18s ease !important;
+  }
+
+  body.nav-open .nav-toggle span:nth-child(1){
+    transform:translateY(7px) rotate(45deg) !important;
+  }
+
+  body.nav-open .nav-toggle span:nth-child(2){
+    opacity:0 !important;
+  }
+
+  body.nav-open .nav-toggle span:nth-child(3){
+    transform:translateY(-7px) rotate(-45deg) !important;
+  }
+
+  .tabs{
+    position:absolute !important;
+    top:100% !important;
+    right:24px !important;
+    width:min(430px, calc(100vw - 48px)) !important;
+    display:grid !important;
+    grid-template-columns:1fr 1fr !important;
+    gap:10px !important;
+    padding:0 !important;
+    background:#ffffff !important;
+    border:1px solid #dbe3ee !important;
+    border-radius:18px !important;
+    box-shadow:0 18px 40px rgba(16,24,40,.12) !important;
+    overflow:hidden !important;
+    max-height:0 !important;
+    opacity:0 !important;
+    pointer-events:none !important;
+    transform:translateY(-10px) !important;
+    transition:max-height .28s ease, opacity .2s ease, transform .28s ease, padding .28s ease !important;
+    z-index:100 !important;
+  }
+
+  body.nav-open .tabs{
+    max-height:500px !important;
+    opacity:1 !important;
+    pointer-events:auto !important;
+    transform:translateY(10px) !important;
+    padding:16px !important;
+  }
+
+  .tabbtn{
+    width:100% !important;
+    justify-content:center !important;
+    min-height:48px !important;
+  }
+
+  header{
+    overflow:visible !important;
+  }
+
+  .wrap.top{
+    position:relative !important;
+  }
+}
+
+
+/* === Remove blue decorative dot before main title === */
+.brand h1::before{
+  content:none !important;
+  display:none !important;
+}
+
+</style>
+</head>
+
+<body>
+<header>
+  <div class="wrap top">
+    <div class="brand">
+      <div>
+        <h1>Криві другого порядку — інтерактивна бібліотека наочностей</h1>
+        <div class="sub">Досліджуйте, налаштовуйте та візуалізуйте криві другого порядку</div>
+      </div>
+    </div>
+
+    <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="siteTabs" aria-label="Відкрити меню розділів">
+      <span></span><span></span><span></span>
+    </button>
+
+    <nav class="tabs" id="siteTabs" role="tablist" aria-label="Розділи">
+      <button class="tabbtn" role="tab" aria-selected="true" data-tab="circle">Коло</button>
+      <button class="tabbtn" role="tab" aria-selected="false" data-tab="ellipse">Еліпс</button>
+      <button class="tabbtn" role="tab" aria-selected="false" data-tab="hyperbola">Гіпербола</button>
+      <button class="tabbtn" role="tab" aria-selected="false" data-tab="parabola">Парабола</button>
+      <button class="tabbtn" role="tab" aria-selected="false" data-tab="elements">Елементи</button>
+      <button class="tabbtn" role="tab" aria-selected="false" data-tab="optics">Оптика</button>
+      <button class="tabbtn" role="tab" aria-selected="false" data-tab="general">Загальне рівняння</button>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <!-- 1) Circle -->
+  <section class="section active" id="sec-circle" aria-labelledby="circle">
+    <div class="grid">
+      <div class="card">
+        <div class="hd">
+          <div>
+            <p class="title">Слайд: Коло (канонічне рівняння)</p>
+            <div class="hint">Змініть параметр <strong>R</strong> та спостерігайте, як змінюється графік.</div>
+          </div>
+          <div class="row">
+            <span class="pill"><strong>Графіка</strong> + вісь + сітка</span>
+          </div>
+        </div>
+        <div class="bd">
+          <canvas id="cv-circle" width="900" height="520"></canvas>
+          <div class="formula">
+            \[
+              x^2 + y^2 = R^2
+            \]
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="hd">
+          <div>
+            <p class="title">Параметри</p>
+            <div class="hint">Поля/повзунки — інтерактивність для користувача.</div>
+          </div>
+        </div>
+        <div class="bd">
+          <div class="controls one">
+            <div class="ctrl">
+              <label>R <span id="circleRVal" class="pill"><strong>5.0</strong></span></label>
+              <input id="circleR" type="range" min="1" max="12" step="0.1" value="5" />
+            </div>
+
+            <div class="ctrl">
+              <label>Масштаб (од./екран) <span id="circleScaleVal" class="pill"><strong>12</strong></span></label>
+              <input id="circleScale" type="range" min="6" max="24" step="1" value="12" />
+            </div>
+
+            <div class="ctrl">
+              <label>Опції</label>
+              <div class="row">
+                <button class="btn" id="circleToggleGrid">Сітка: увімкн.</button>
+                <button class="btn" id="circleToggleLabels">Підписи: увімкн.</button>
+                <button class="btn danger" id="circleReset">Скинути</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="footer">
+            Підказка: координатна сітка допомагає «читати» параметри та розміри кола.
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2) Ellipse -->
+  <section class="section" id="sec-ellipse" aria-labelledby="ellipse">
+    <div class="grid">
+      <div class="card">
+        <div class="hd">
+          <div>
+            <p class="title">Слайд: Еліпс (канонічне рівняння)</p>
+            <div class="hint">Змінюйте параметри <strong>a</strong> і <strong>b</strong> (A і B) та досліджуйте форму.</div>
+          </div>
+        </div>
+        <div class="bd">
+          <canvas id="cv-ellipse" width="900" height="520"></canvas>
+          <div class="formula">
+            \[
+              \frac{x^2}{a^2} + \frac{y^2}{b^2} = 1
+            \]
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="hd">
+          <div>
+            <p class="title">Параметри (A і B)</p>
+            <div class="hint">Побачите напівосі, фокуси та площу еліпса.</div>
+          </div>
+        </div>
+        <div class="bd">
+          <div class="controls">
+            <div class="ctrl">
+              <label>a (A) <span id="ellAVal" class="pill"><strong>7.0</strong></span></label>
+              <input id="ellA" type="range" min="1" max="14" step="0.1" value="7" />
+            </div>
+            <div class="ctrl">
+              <label>b (B) <span id="ellBVal" class="pill"><strong>4.5</strong></span></label>
+              <input id="ellB" type="range" min="1" max="14" step="0.1" value="4.5" />
+            </div>
+            <div class="ctrl">
+              <label>Показувати фокуси</label>
+              <button class="btn" id="ellToggleFoci">Фокуси: увімкн.</button>
+            </div>
+            <div class="ctrl">
+              <label>Масштаб (од./екран)</label>
+              <input id="ellScale" type="range" min="8" max="24" step="1" value="14" />
+            </div>
+          </div>
+
+          <div style="margin-top:12px" class="kpi">
+            <div class="pill">\(c=\sqrt{a^2-b^2}\): <strong id="ellC">—</strong></div>
+            <div class="pill">Площа \(S=\pi ab\): <strong id="ellArea">—</strong></div>
+          </div>
+
+          <div class="footer">
+            Якщо \(a&lt;b\), система автоматично переставить ролі осей для коректного обчислення фокусів.
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3) Hyperbola -->
+  <section class="section" id="sec-hyperbola" aria-labelledby="hyperbola">
+    <div class="grid">
+      <div class="card">
+        <div class="hd">
+          <div>
+            <p class="title">Слайд: Гіпербола (канонічне рівняння)</p>
+            <div class="hint">Відстежуйте гілки та асимптоти при зміні <strong>a</strong>, <strong>b</strong>.</div>
+          </div>
+        </div>
+        <div class="bd">
+          <canvas id="cv-hyperbola" width="900" height="520"></canvas>
+          <div class="formula">
+            \[
+              \frac{x^2}{a^2} - \frac{y^2}{b^2} = 1
+            \]
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="hd">
+          <div>
+            <p class="title">Параметри (A і B)</p>
+            <div class="hint">За бажанням — увімкніть асимптоти й фокуси.</div>
+          </div>
+        </div>
+        <div class="bd">
+          <div class="controls">
+            <div class="ctrl">
+              <label>a (A) <span id="hypAVal" class="pill"><strong>5.5</strong></span></label>
+              <input id="hypA" type="range" min="1" max="14" step="0.1" value="5.5" />
+            </div>
+            <div class="ctrl">
+              <label>b (B) <span id="hypBVal" class="pill"><strong>3.5</strong></span></label>
+              <input id="hypB" type="range" min="1" max="14" step="0.1" value="3.5" />
+            </div>
+            <div class="ctrl">
+              <label>Опції</label>
+              <div class="row">
+                <button class="btn" id="hypToggleAsy">Асимптоти: увімкн.</button>
+                <button class="btn" id="hypToggleFoci">Фокуси: вимкн.</button>
+              </div>
+            </div>
+            <div class="ctrl">
+              <label>Масштаб (од./екран)</label>
+              <input id="hypScale" type="range" min="8" max="28" step="1" value="18" />
+            </div>
+          </div>
+
+          <div style="margin-top:12px" class="kpi">
+            <div class="pill">\(c=\sqrt{a^2+b^2}\): <strong id="hypC">—</strong></div>
+            <div class="pill">Асимптоти: \(y=\pm \frac{b}{a}x\)</div>
+          </div>
+
+          <div class="footer">
+            На графіку гіперболи використовуємо параметризацію \(x=a\cosh t,\; y=b\sinh t\).
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4) Parabola -->
+  <section class="section" id="sec-parabola" aria-labelledby="parabola">
+    <div class="grid">
+      <div class="card">
+        <div class="hd">
+          <div>
+            <p class="title">Слайд: Парабола (канонічне рівняння)</p>
+            <div class="hint">Змінюйте параметр <strong>p</strong>, вмикайте фокус і директрису.</div>
+          </div>
+        </div>
+        <div class="bd">
+          <canvas id="cv-parabola" width="900" height="520"></canvas>
+          <div class="formula">
+            \[
+              y^2 = 2px
+            \]
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="hd">
+          <div>
+            <p class="title">Параметри</p>
+            <div class="hint">Оптична властивість (демо) — у вкладці «Оптика».</div>
+          </div>
+        </div>
+        <div class="bd">
+          <div class="controls">
+            <div class="ctrl">
+              <label>p <span id="parPVal" class="pill"><strong>4.0</strong></span></label>
+              <input id="parP" type="range" min="0.5" max="14" step="0.1" value="4" />
+            </div>
+            <div class="ctrl">
+              <label>Масштаб (од./екран)</label>
+              <input id="parScale" type="range" min="8" max="30" step="1" value="16" />
+            </div>
+            <div class="ctrl">
+              <label>Опції</label>
+              <div class="row">
+                <button class="btn" id="parToggleFD">Фокус/директриса: увімкн.</button>
+                <button class="btn danger" id="parReset">Скинути</button>
+              </div>
+            </div>
+            <div class="ctrl">
+              <label>Орієнтація</label>
+              <select id="parOrient">
+                <option value="right" selected>Відкривається вправо</option>
+                <option value="left">Відкривається вліво</option>
+                <option value="up">Відкривається вгору</option>
+                <option value="down">Відкривається вниз</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="footer">
+            Для інших орієнтацій застосовуємо поворот/перестановку осей (візуально — як «конусний перетин»).
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5) Elements -->
+  <section class="section" id="sec-elements" aria-labelledby="elements">
+    <div class="grid">
+      <div class="card">
+        <div class="hd">
+          <div>
+            <p class="title">Група: Елементи кривих другого порядку</p>
+            <div class="hint">Напівосі, хорда, діаметр (на еліпсі) + площа.</div>
+          </div>
+        </div>
+        <div class="bd">
+          <canvas id="cv-elements" width="900" height="520"></canvas>
+          <div class="small">
+            Використовується еліпс: \(\frac{x^2}{a^2}+\frac{y^2}{b^2}=1\). Можна тягнути «точки» хорди мишкою.
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="hd">
+          <div>
+            <p class="title">Керування</p>
+            <div class="hint">Параметри A і B + опції елементів.</div>
+          </div>
+        </div>
+        <div class="bd">
+          <div class="controls">
+            <div class="ctrl">
+              <label>a (A) <span id="elAVal" class="pill"><strong>8.0</strong></span></label>
+              <input id="elA" type="range" min="1" max="16" step="0.1" value="8" />
+            </div>
+            <div class="ctrl">
+              <label>b (B) <span id="elBVal" class="pill"><strong>5.0</strong></span></label>
+              <input id="elB" type="range" min="1" max="16" step="0.1" value="5" />
+            </div>
+            <div class="ctrl">
+              <label>Показувати</label>
+              <div class="row">
+                <button class="btn" id="elToggleAxes">Напівосі: увімкн.</button>
+                <button class="btn" id="elToggleChord">Хорда: увімкн.</button>
+                <button class="btn" id="elToggleDiameter">Діаметр: вимкн.</button>
+              </div>
+            </div>
+            <div class="ctrl">
+              <label>Масштаб (од./екран)</label>
+              <input id="elScale" type="range" min="8" max="28" step="1" value="16" />
+            </div>
+          </div>
+
+          <div style="margin-top:12px" class="kpi">
+            <div class="pill">Довжина хорди: <strong id="chordLen">—</strong></div>
+            <div class="pill">Площа еліпса \(S=\pi ab\): <strong id="elArea">—</strong></div>
+          </div>
+
+          <div class="footer">
+            Діаметр показано як пряма через центр, паралельна хорді (для наочного розуміння).
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6) Optics -->
+  <section class="section" id="sec-optics" aria-labelledby="optics">
+    <div class="grid">
+      <div class="card">
+        <div class="hd">
+          <div>
+            <p class="title">Група: Оптичні властивості</p>
+            <div class="hint">Демо: парабола (паралельні промені → фокус) та еліпс (фокус → фокус).</div>
+          </div>
+        </div>
+        <div class="bd">
+          <canvas id="cv-optics" width="900" height="520"></canvas>
+          <div class="small">
+            Увімкніть/вимкніть промені та змініть криву. Це навчальна ілюстрація (геометричний сенс).
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="hd">
+          <div>
+            <p class="title">Налаштування демо</p>
+            <div class="hint">Обирайте криву та кількість променів.</div>
+          </div>
+        </div>
+        <div class="bd">
+          <div class="controls one">
+            <div class="ctrl">
+              <label>Режим</label>
+              <select id="opMode">
+                <option value="parabola" selected>Парабола: паралельні → фокус</option>
+                <option value="ellipse">Еліпс: фокус → фокус</option>
+              </select>
+            </div>
+
+            <div class="ctrl">
+              <label>Інтенсивність (кількість променів) <span id="opRaysVal" class="pill"><strong>9</strong></span></label>
+              <input id="opRays" type="range" min="3" max="21" step="1" value="9" />
+            </div>
+
+            <div class="ctrl" id="opParControls">
+              <label>p (для параболи) <span id="opPVal" class="pill"><strong>5.0</strong></span></label>
+              <input id="opP" type="range" min="1" max="14" step="0.1" value="5" />
+            </div>
+
+            <div class="ctrl" id="opEllControls" style="display:none">
+              <label>a,b (для еліпса)</label>
+              <div class="row">
+                <input id="opA" type="number" step="0.1" min="1" max="20" value="9.0" />
+                <input id="opB" type="number" step="0.1" min="1" max="20" value="5.5" />
+              </div>
+            </div>
+
+            <div class="ctrl">
+              <label>Масштаб (од./екран)</label>
+              <input id="opScale" type="range" min="10" max="30" step="1" value="20" />
+            </div>
+
+            <div class="ctrl">
+              <label>Конус (схема перетину)</label>
+              <button class="btn" id="opToggleCone">Показати конус: вимкн.</button>
+              <div class="small" style="margin-top:8px">
+                Схема «вгору/вниз» — як нагадування, що крива є перетином подвійного конуса площиною.
+              </div>
+            </div>
+          </div>
+
+          <div class="footer">
+            Візуалізація променів — демонстраційна: для реальної «фізичної» моделі потрібні закони відбиття та нормалі (але для навчання сенс зберігається).
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7) General equation -->
+  <section class="section" id="sec-general" aria-labelledby="general">
+    <div class="grid">
+      <div class="card">
+        <div class="hd">
+          <div>
+            <p class="title">Остання група: Загальне рівняння → канонічна форма</p>
+            <div class="hint">Введіть коефіцієнти \(Ax^2+Bxy+Cy^2+Dx+Ey+F=0\) та подивіться класифікацію і графік.</div>
+          </div>
+        </div>
+        <div class="bd">
+          <canvas id="cv-general" width="900" height="520"></canvas>
+          <div class="small" id="genInfo">
+            —
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="hd">
+          <div>
+            <p class="title">Коефіцієнти + редагування графіки</p>
+            <div class="hint">Підтримано поворот (для усунення \(xy\)) та зсув (центр/вершина) — чисельно.</div>
+          </div>
+        </div>
+        <div class="bd">
+          <div class="controls">
+            <div class="ctrl"><label>A</label><input id="gA" type="number" step="0.1" value="1"></div>
+            <div class="ctrl"><label>B</label><input id="gB" type="number" step="0.1" value="0"></div>
+            <div class="ctrl"><label>C</label><input id="gC" type="number" step="0.1" value="1"></div>
+            <div class="ctrl"><label>D</label><input id="gD" type="number" step="0.1" value="0"></div>
+            <div class="ctrl"><label>E</label><input id="gE" type="number" step="0.1" value="0"></div>
+            <div class="ctrl"><label>F</label><input id="gF" type="number" step="0.1" value="-49"></div>
+          </div>
+
+          <div style="margin-top:12px" class="controls one">
+            <div class="ctrl">
+              <label>Масштаб (од./екран)</label>
+              <input id="gScale" type="range" min="8" max="40" step="1" value="18" />
+            </div>
+
+            <div class="ctrl">
+              <label>Редагування (панорамування/зум)</label>
+              <div class="row">
+                <button class="btn" id="gTogglePan">Панорамування: вимкн.</button>
+                <button class="btn" id="gZoomIn">Зум +</button>
+                <button class="btn" id="gZoomOut">Зум −</button>
+                <button class="btn danger" id="gReset">Скинути</button>
+              </div>
+              <div class="small" style="margin-top:8px">
+                Якщо панорамування увімкнено — перетягніть мишкою полотно.
+              </div>
+            </div>
+
+            <div class="ctrl">
+              <label>Швидкі приклади</label>
+              <div class="row">
+                <button class="btn" data-preset="circle">Коло</button>
+                <button class="btn" data-preset="ellipse">Еліпс</button>
+                <button class="btn" data-preset="hyperbola">Гіпербола</button>
+                <button class="btn" data-preset="parabola">Парабола</button>
+                <button class="btn" data-preset="rotated">Поворот (B≠0)</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="footer">
+            Графік будується як <em>неявна крива</em> через ізолінію \(f(x,y)=0\) (marching squares).
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script>
+/* ================================
+   Utilities: Canvas coordinate system
+================================ */
+function makePlot(canvas){
+  const ctx = canvas.getContext('2d');
+  const state = {
+    canvas, ctx,
+    scaleUnits: 12,           // half-range in world units
+    showGrid: true,
+    showLabels: true,
+    panX: 0, panY: 0          // world translation
+  };
+
+  function resizeToCSS(){
+    const cssW = canvas.clientWidth, cssH = canvas.clientHeight;
+    if (cssW && cssH){
+      const dpr = window.devicePixelRatio || 1;
+      const w = Math.round(cssW * dpr), h = Math.round(cssH * dpr);
+      if (canvas.width !== w || canvas.height !== h){
+        canvas.width = w; canvas.height = h;
+      }
+    }
+  }
+
+  function worldToScreen(x,y){
+    const {width:w, height:h} = canvas;
+    const s = Math.min(w,h)/(2*state.scaleUnits);
+    // origin in center + pan
+    const X = w/2 + (x - state.panX)*s;
+    const Y = h/2 - (y - state.panY)*s;
+    return [X,Y];
+  }
+
+  function screenToWorld(X,Y){
+    const {width:w, height:h} = canvas;
+    const s = Math.min(w,h)/(2*state.scaleUnits);
+    const x = (X - w/2)/s + state.panX;
+    const y = -(Y - h/2)/s + state.panY;
+    return [x,y];
+  }
+
+  function clear(){
+    resizeToCSS();
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+  }
+
+  function drawGrid(){
+    if (!state.showGrid) return;
+
+    const {width:w,height:h} = canvas;
+    const s = Math.min(w,h)/(2*state.scaleUnits);
+    const step = pickNiceStep(state.scaleUnits);
+    ctx.save();
+    ctx.lineWidth = 1;
+    ctx.globalAlpha = 0.55;
+
+    // minor lines
+    ctx.strokeStyle = "rgba(15,23,42,0.08)";
+    for (let x = Math.floor((state.panX-state.scaleUnits)/step)*step; x <= state.panX+state.scaleUnits; x += step){
+      const [X0,Y0] = worldToScreen(x, state.panY-state.scaleUnits);
+      const [X1,Y1] = worldToScreen(x, state.panY+state.scaleUnits);
+      ctx.beginPath(); ctx.moveTo(X0,Y0); ctx.lineTo(X1,Y1); ctx.stroke();
+    }
+    for (let y = Math.floor((state.panY-state.scaleUnits)/step)*step; y <= state.panY+state.scaleUnits; y += step){
+      const [X0,Y0] = worldToScreen(state.panX-state.scaleUnits, y);
+      const [X1,Y1] = worldToScreen(state.panX+state.scaleUnits, y);
+      ctx.beginPath(); ctx.moveTo(X0,Y0); ctx.lineTo(X1,Y1); ctx.stroke();
+    }
+
+    // axes
+    ctx.globalAlpha = 0.9;
+    ctx.strokeStyle = "rgba(15,23,42,0.20)";
+    let [ax0,ay0] = worldToScreen(state.panX-state.scaleUnits, 0);
+    let [ax1,ay1] = worldToScreen(state.panX+state.scaleUnits, 0);
+    ctx.beginPath(); ctx.moveTo(ax0,ay0); ctx.lineTo(ax1,ay1); ctx.stroke();
+
+    let [bx0,by0] = worldToScreen(0, state.panY-state.scaleUnits);
+    let [bx1,by1] = worldToScreen(0, state.panY+state.scaleUnits);
+    ctx.beginPath(); ctx.moveTo(bx0,by0); ctx.lineTo(bx1,by1); ctx.stroke();
+
+    // labels
+    if (state.showLabels){
+      ctx.globalAlpha = 0.85;
+      ctx.fillStyle = "rgba(71,85,105,0.85)";
+      ctx.font = `${12*(window.devicePixelRatio||1)}px system-ui`;
+      for (let x = Math.floor((state.panX-state.scaleUnits)/step)*step; x <= state.panX+state.scaleUnits; x += step){
+        if (Math.abs(x) < 1e-9) continue;
+        const [X,Y] = worldToScreen(x,0);
+        ctx.fillText(String(fix(x)), X+3, Y-3);
+      }
+      for (let y = Math.floor((state.panY-state.scaleUnits)/step)*step; y <= state.panY+state.scaleUnits; y += step){
+        if (Math.abs(y) < 1e-9) continue;
+        const [X,Y] = worldToScreen(0,y);
+        ctx.fillText(String(fix(y)), X+3, Y-3);
+      }
+    }
+
+    ctx.restore();
+  }
+
+  function pickNiceStep(range){
+    // range is half-width; choose grid step
+    const raw = range/6;
+    const pow = Math.pow(10, Math.floor(Math.log10(raw)));
+    const m = raw/pow;
+    let step;
+    if (m < 1.5) step = 1*pow;
+    else if (m < 3.5) step = 2*pow;
+    else if (m < 7.5) step = 5*pow;
+    else step = 10*pow;
+    return step;
+  }
+
+  function fix(x){
+    const ax = Math.abs(x);
+    if (ax >= 10) return Math.round(x);
+    if (ax >= 1) return Math.round(x*10)/10;
+    return Math.round(x*100)/100;
+  }
+
+  function line(x1,y1,x2,y2, style="rgba(37,99,235,0.9)", width=2){
+    const [X1,Y1]=worldToScreen(x1,y1), [X2,Y2]=worldToScreen(x2,y2);
+    ctx.save();
+    ctx.strokeStyle=style; ctx.lineWidth=width*(window.devicePixelRatio||1);
+    ctx.beginPath(); ctx.moveTo(X1,Y1); ctx.lineTo(X2,Y2); ctx.stroke();
+    ctx.restore();
+  }
+
+  function point(x,y, r=5, style="rgba(22,163,74,0.95)"){
+    const [X,Y]=worldToScreen(x,y);
+    ctx.save();
+    ctx.fillStyle=style;
+    ctx.beginPath(); ctx.arc(X,Y,r*(window.devicePixelRatio||1),0,Math.PI*2); ctx.fill();
+    ctx.restore();
+  }
+
+  function text(x,y, t, style="rgba(51,65,85,0.92)"){
+    const [X,Y]=worldToScreen(x,y);
+    ctx.save();
+    ctx.fillStyle=style;
+    ctx.font = `${12*(window.devicePixelRatio||1)}px system-ui`;
+    ctx.fillText(t, X+6, Y-6);
+    ctx.restore();
+  }
+
+  function polyline(pts, style="rgba(37,99,235,0.9)", width=2){
+    if (pts.length<2) return;
+    ctx.save();
+    ctx.strokeStyle=style;
+    ctx.lineWidth=width*(window.devicePixelRatio||1);
+    ctx.beginPath();
+    let [X0,Y0]=worldToScreen(pts[0][0],pts[0][1]);
+    ctx.moveTo(X0,Y0);
+    for(let i=1;i<pts.length;i++){
+      let [X,Y]=worldToScreen(pts[i][0],pts[i][1]);
+      ctx.lineTo(X,Y);
+    }
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  return {state, clear, drawGrid, worldToScreen, screenToWorld, line, point, text, polyline, resizeToCSS};
+}
+
+/* ================================
+   Shapes
+================================ */
+function drawCircle(plot, R){
+  const {ctx, canvas} = plot.state;
+  plot.clear(); plot.drawGrid();
+
+  const pts=[];
+  for(let i=0;i<=360;i++){
+    const t=i*Math.PI/180;
+    pts.push([R*Math.cos(t), R*Math.sin(t)]);
+  }
+  plot.polyline(pts, "rgba(37,99,235,0.95)", 2.2);
+  plot.point(R,0,4); plot.point(0,R,4);
+  plot.text(R,0, `R=${R.toFixed(2)}`);
+}
+
+function drawEllipse(plot, a, b, showFoci){
+  plot.clear(); plot.drawGrid();
+
+  // ensure a>=b for c
+  let swapped=false;
+  let A=a, B=b;
+  if (B > A){ [A,B]=[B,A]; swapped=true; }
+  const c = Math.sqrt(Math.max(0, A*A - B*B));
+
+  const pts=[];
+  for(let i=0;i<=360;i++){
+    const t=i*Math.PI/180;
+    pts.push([a*Math.cos(t), b*Math.sin(t)]);
+  }
+  plot.polyline(pts, "rgba(37,99,235,0.95)", 2.2);
+
+  // axes
+  plot.line(-a,0,a,0,"rgba(15,23,42,0.28)",1.6);
+  plot.line(0,-b,0,b,"rgba(15,23,42,0.28)",1.6);
+  plot.text(a,0,"a"); plot.text(0,b,"b");
+
+  if (showFoci){
+    // foci depend on major axis direction; in our drawing major axis is x if a>=b else y
+    if (!swapped){
+      plot.point(c,0,4,"rgba(22,163,74,0.95)");
+      plot.point(-c,0,4,"rgba(22,163,74,0.95)");
+      plot.text(c,0,"F₁"); plot.text(-c,0,"F₂");
+    } else {
+      plot.point(0,c,4,"rgba(22,163,74,0.95)");
+      plot.point(0,-c,4,"rgba(22,163,74,0.95)");
+      plot.text(0,c,"F₁"); plot.text(0,-c,"F₂");
+    }
+  }
+  return {c, majorA:A, minorB:B, swapped};
+}
+
+function drawHyperbola(plot, a, b, showAsy, showFoci){
+  plot.clear(); plot.drawGrid();
+
+  // branches via cosh/sinh
+  const tMax = 2.2;
+  const pts1=[], pts2=[];
+  for (let i=0;i<=240;i++){
+    const t = -tMax + (2*tMax)*i/240;
+    const x = a*Math.cosh(t);
+    const y = b*Math.sinh(t);
+    pts1.push([x,y]);
+    pts2.push([-x,y]);
+  }
+  plot.polyline(pts1,"rgba(37,99,235,0.95)",2.2);
+  plot.polyline(pts2,"rgba(37,99,235,0.95)",2.2);
+
+  if (showAsy){
+    const m = b/a;
+    const L = plot.state.scaleUnits*1.2;
+    plot.line(-L, -m*L, L, m*L, "rgba(15,23,42,0.24)",1.6);
+    plot.line(-L, m*L, L, -m*L, "rgba(15,23,42,0.24)",1.6);
+  }
+
+  if (showFoci){
+    const c = Math.sqrt(a*a + b*b);
+    plot.point(c,0,4,"rgba(22,163,74,0.95)");
+    plot.point(-c,0,4,"rgba(22,163,74,0.95)");
+    plot.text(c,0,"F₁"); plot.text(-c,0,"F₂");
+  }
+
+  // vertices
+  plot.point(a,0,4,"rgba(245,158,11,0.95)");
+  plot.point(-a,0,4,"rgba(245,158,11,0.95)");
+  plot.text(a,0,"V"); plot.text(-a,0,"V");
+  return {c: Math.sqrt(a*a + b*b)};
+}
+
+function drawParabola(plot, p, orient="right", showFD=true){
+  plot.clear(); plot.drawGrid();
+  // canonical: y^2 = 2px (right). For other orientations: rotate/reflect
+  const pts=[];
+  const xMin = -plot.state.scaleUnits, xMax = plot.state.scaleUnits;
+  const samples = 300;
+
+  function mapXY(x,y){
+    switch(orient){
+      case "right": return [x,y];
+      case "left":  return [-x,y];
+      case "up":    return [y,x];  // swap -> x^2 = 2py
+      case "down":  return [y,-x];
+    }
+    return [x,y];
+  }
+
+  // build in right orientation then map
+  for(let i=0;i<=samples;i++){
+    const x = (0 + (xMax-0)*i/samples);
+    const y = Math.sqrt(Math.max(0, 2*p*x));
+    const [X1,Y1] = mapXY(x, y);
+    pts.push([X1,Y1]);
+  }
+  const pts2=[];
+  for(let i=samples;i>=0;i--){
+    const x = (0 + (xMax-0)*i/samples);
+    const y = -Math.sqrt(Math.max(0, 2*p*x));
+    const [X1,Y1] = mapXY(x, y);
+    pts2.push([X1,Y1]);
+  }
+  plot.polyline(pts.concat(pts2), "rgba(37,99,235,0.95)", 2.2);
+
+  if (showFD){
+    // focus and directrix for right orientation:
+    // focus (p/2,0), directrix x = -p/2
+    let fx = p/2, fy = 0;
+    let dir = {x:-p/2, y:null}; // vertical line x = -p/2
+
+    // map for other orientations
+    function mapPoint(x,y){ return mapXY(x,y); }
+    function mapLineX(constX){
+      // x=const vertical line mapped under our crude transforms above
+      // For right/left: stays vertical
+      // For up/down: becomes horizontal y=const
+      if (orient==="right") return {type:"x", v:constX};
+      if (orient==="left")  return {type:"x", v:-constX};
+      if (orient==="up")    return {type:"y", v:constX};
+      if (orient==="down")  return {type:"y", v:-constX};
+      return {type:"x", v:constX};
+    }
+
+    const [fX,fY] = mapPoint(fx,fy);
+    plot.point(fX,fY,4,"rgba(22,163,74,0.95)");
+    plot.text(fX,fY,"F");
+
+    const L = plot.state.scaleUnits*1.2;
+    const lineSpec = mapLineX(-p/2);
+    if (lineSpec.type==="x"){
+      plot.line(lineSpec.v, -L, lineSpec.v, L, "rgba(15,23,42,0.24)", 1.6);
+      plot.text(lineSpec.v, 0, "директриса");
+    } else {
+      plot.line(-L, lineSpec.v, L, lineSpec.v, "rgba(15,23,42,0.24)", 1.6);
+      plot.text(0, lineSpec.v, "директриса");
+    }
+  }
+}
+
+/* ================================
+   Implicit plotting (marching squares)
+================================ */
+function drawImplicit(plot, f, opts={}){
+  const {ctx, canvas} = plot.state;
+  plot.clear(); plot.drawGrid();
+
+  const w = canvas.width, h = canvas.height;
+  const stepPx = Math.max(6, Math.round(10*(window.devicePixelRatio||1)));
+  const cols = Math.floor(w/stepPx);
+  const rows = Math.floor(h/stepPx);
+
+  // Sample scalar field on grid
+  const values = new Array((cols+1)*(rows+1));
+  for(let j=0;j<=rows;j++){
+    for(let i=0;i<=cols;i++){
+      const X = i*stepPx;
+      const Y = j*stepPx;
+      const [x,y] = plot.screenToWorld(X,Y);
+      values[j*(cols+1)+i] = f(x,y);
+    }
+  }
+
+  // Marching squares for isovalue 0
+  ctx.save();
+  ctx.strokeStyle = "rgba(37,99,235,0.95)";
+  ctx.lineWidth = 2.2*(window.devicePixelRatio||1);
+  ctx.globalAlpha = 0.95;
+
+  function interp(p1, p2, v1, v2){
+    const t = v1/(v1 - v2); // value=0
+    return [ p1[0] + t*(p2[0]-p1[0]), p1[1] + t*(p2[1]-p1[1]) ];
+  }
+
+  for(let j=0;j<rows;j++){
+    for(let i=0;i<cols;i++){
+      const idx = j*(cols+1)+i;
+      const v0 = values[idx];
+      const v1 = values[idx+1];
+      const v2 = values[idx+(cols+1)+1];
+      const v3 = values[idx+(cols+1)];
+
+      // corners in screen px
+      const p0 = [i*stepPx, j*stepPx];
+      const p1 = [(i+1)*stepPx, j*stepPx];
+      const p2 = [(i+1)*stepPx, (j+1)*stepPx];
+      const p3 = [i*stepPx, (j+1)*stepPx];
+
+      let c = 0;
+      if (v0 >= 0) c |= 1;
+      if (v1 >= 0) c |= 2;
+      if (v2 >= 0) c |= 4;
+      if (v3 >= 0) c |= 8;
+
+      // edges: e0 p0-p1, e1 p1-p2, e2 p2-p3, e3 p3-p0
+      const edges = [];
+      switch(c){
+        case 0: case 15: break;
+        case 1: case 14:
+          edges.push([interp(p3,p0,v3,v0), interp(p0,p1,v0,v1)]); break;
+        case 2: case 13:
+          edges.push([interp(p0,p1,v0,v1), interp(p1,p2,v1,v2)]); break;
+        case 3: case 12:
+          edges.push([interp(p3,p0,v3,v0), interp(p1,p2,v1,v2)]); break;
+        case 4: case 11:
+          edges.push([interp(p1,p2,v1,v2), interp(p2,p3,v2,v3)]); break;
+        case 5:
+          edges.push([interp(p3,p0,v3,v0), interp(p0,p1,v0,v1)]);
+          edges.push([interp(p1,p2,v1,v2), interp(p2,p3,v2,v3)]);
+          break;
+        case 6: case 9:
+          edges.push([interp(p0,p1,v0,v1), interp(p2,p3,v2,v3)]); break;
+        case 7: case 8:
+          edges.push([interp(p3,p0,v3,v0), interp(p2,p3,v2,v3)]); break;
+        case 10:
+          edges.push([interp(p0,p1,v0,v1), interp(p1,p2,v1,v2)]);
+          edges.push([interp(p2,p3,v2,v3), interp(p3,p0,v3,v0)]);
+          break;
+      }
+
+      for (const seg of edges){
+        ctx.beginPath();
+        ctx.moveTo(seg[0][0], seg[0][1]);
+        ctx.lineTo(seg[1][0], seg[1][1]);
+        ctx.stroke();
+      }
+    }
+  }
+  ctx.restore();
+}
+
+/* ================================
+   Conic classification & canonical hints (numeric)
+   We compute invariants and (approx) rotation angle to remove xy term.
+================================ */
+function classifyConic(A,B,C,D,E,F){
+  // invariants
+  const delta = B*B - 4*A*C;
+  // determinant of the 3x3 (degeneracy test)
+  const det =
+    A*(C*F - (E*E)/4) -
+    (B/2)*((B/2)*F - (D*E)/4) +
+    (D/2)*((B/2)*(E/2) - C*(D/2));
+  // robust det (explicit formula)
+  const Det = A*(C*F - (E*E)/4) - (B/2)*((B/2)*F - (D*E)/4) + (D/2)*((B*E)/4 - C*(D/2));
+
+  let type;
+  if (Math.abs(delta) < 1e-9) type = "Парабола (або вироджений випадок)";
+  else if (delta < 0) type = "Еліпс / коло (або уявний еліпс)";
+  else type = "Гіпербола";
+
+  // rotation to eliminate xy:
+  let theta = 0;
+  if (Math.abs(B) > 1e-12 && Math.abs(A-C) > 1e-12){
+    theta = 0.5 * Math.atan2(B, A - C);
+  } else if (Math.abs(B) > 1e-12 && Math.abs(A-C) <= 1e-12){
+    theta = Math.PI/4; // approximate
+  }
+
+  return {delta, type, theta, det: Det};
+}
+
+function rotateCoeffs(A,B,C,D,E,F, theta){
+  // rotate coordinates: x = X cos - Y sin, y = X sin + Y cos
+  const c = Math.cos(theta), s = Math.sin(theta);
+
+  // Transform quadratic form
+  // Using formulas for rotated conic coefficients:
+  const A2 = A*c*c + B*c*s + C*s*s;
+  const B2 = 2*(C-A)*s*c + B*(c*c - s*s);
+  const C2 = A*s*s - B*s*c + C*c*c;
+
+  const D2 = D*c + E*s;
+  const E2 = -D*s + E*c;
+
+  return {A:A2, B:B2, C:C2, D:D2, E:E2, F};
+}
+
+/* ================================
+   Tabs
+================================ */
+const tabBtns = document.querySelectorAll('.tabbtn');
+const navToggle = document.querySelector('.nav-toggle');
+if (navToggle){
+  navToggle.addEventListener('click', () => {
+    const opened = document.body.classList.toggle('nav-open');
+    navToggle.setAttribute('aria-expanded', opened ? 'true' : 'false');
+  });
+}
+function activateTab(name){
+  tabBtns.forEach(b => b.setAttribute('aria-selected', b.dataset.tab===name ? "true" : "false"));
+  document.querySelectorAll('.section').forEach(sec => sec.classList.remove('active'));
+  document.getElementById('sec-'+name).classList.add('active');
+  // trigger redraw for current section
+  if (navToggle && window.matchMedia('(max-width: 760px)').matches){
+    document.body.classList.remove('nav-open');
+    navToggle.setAttribute('aria-expanded','false');
+  }
+  requestAnimationFrame(() => redrawAll());
+}
+tabBtns.forEach(b => b.addEventListener('click', () => activateTab(b.dataset.tab)));
+
+/* ================================
+   Initialize plots
+================================ */
+const plots = {
+  circle: makePlot(document.getElementById('cv-circle')),
+  ellipse: makePlot(document.getElementById('cv-ellipse')),
+  hyperbola: makePlot(document.getElementById('cv-hyperbola')),
+  parabola: makePlot(document.getElementById('cv-parabola')),
+  elements: makePlot(document.getElementById('cv-elements')),
+  optics: makePlot(document.getElementById('cv-optics')),
+  general: makePlot(document.getElementById('cv-general')),
+};
+
+/* ================================
+   Circle controls
+================================ */
+let circleState = {R:5, scale:12, grid:true, labels:true};
+document.getElementById('circleR').addEventListener('input', e=>{
+  circleState.R = parseFloat(e.target.value);
+  document.getElementById('circleRVal').innerHTML = `<strong>${circleState.R.toFixed(1)}</strong>`;
+  redrawAll();
+});
+document.getElementById('circleScale').addEventListener('input', e=>{
+  circleState.scale = parseFloat(e.target.value);
+  document.getElementById('circleScaleVal').innerHTML = `<strong>${circleState.scale}</strong>`;
+  redrawAll();
+});
+document.getElementById('circleToggleGrid').addEventListener('click', ()=>{
+  circleState.grid = !circleState.grid;
+  document.getElementById('circleToggleGrid').textContent = `Сітка: ${circleState.grid ? "увімкн." : "вимкн."}`;
+  redrawAll();
+});
+document.getElementById('circleToggleLabels').addEventListener('click', ()=>{
+  circleState.labels = !circleState.labels;
+  document.getElementById('circleToggleLabels').textContent = `Підписи: ${circleState.labels ? "увімкн." : "вимкн."}`;
+  redrawAll();
+});
+document.getElementById('circleReset').addEventListener('click', ()=>{
+  circleState = {R:5, scale:12, grid:true, labels:true};
+  document.getElementById('circleR').value = circleState.R;
+  document.getElementById('circleScale').value = circleState.scale;
+  document.getElementById('circleRVal').innerHTML = `<strong>${circleState.R.toFixed(1)}</strong>`;
+  document.getElementById('circleScaleVal').innerHTML = `<strong>${circleState.scale}</strong>`;
+  document.getElementById('circleToggleGrid').textContent = `Сітка: увімкн.`;
+  document.getElementById('circleToggleLabels').textContent = `Підписи: увімкн.`;
+  redrawAll();
+});
+
+/* ================================
+   Ellipse controls
+================================ */
+let ellState = {a:7, b:4.5, foci:true, scale:14};
+document.getElementById('ellA').addEventListener('input', e=>{
+  ellState.a = parseFloat(e.target.value);
+  document.getElementById('ellAVal').innerHTML = `<strong>${ellState.a.toFixed(1)}</strong>`;
+  redrawAll();
+});
+document.getElementById('ellB').addEventListener('input', e=>{
+  ellState.b = parseFloat(e.target.value);
+  document.getElementById('ellBVal').innerHTML = `<strong>${ellState.b.toFixed(1)}</strong>`;
+  redrawAll();
+});
+document.getElementById('ellToggleFoci').addEventListener('click', ()=>{
+  ellState.foci = !ellState.foci;
+  document.getElementById('ellToggleFoci').textContent = `Фокуси: ${ellState.foci ? "увімкн." : "вимкн."}`;
+  redrawAll();
+});
+document.getElementById('ellScale').addEventListener('input', e=>{
+  ellState.scale = parseFloat(e.target.value);
+  redrawAll();
+});
+
+/* ================================
+   Hyperbola controls
+================================ */
+let hypState = {a:5.5, b:3.5, asy:true, foci:false, scale:18};
+document.getElementById('hypA').addEventListener('input', e=>{
+  hypState.a = parseFloat(e.target.value);
+  document.getElementById('hypAVal').innerHTML = `<strong>${hypState.a.toFixed(1)}</strong>`;
+  redrawAll();
+});
+document.getElementById('hypB').addEventListener('input', e=>{
+  hypState.b = parseFloat(e.target.value);
+  document.getElementById('hypBVal').innerHTML = `<strong>${hypState.b.toFixed(1)}</strong>`;
+  redrawAll();
+});
+document.getElementById('hypToggleAsy').addEventListener('click', ()=>{
+  hypState.asy = !hypState.asy;
+  document.getElementById('hypToggleAsy').textContent = `Асимптоти: ${hypState.asy ? "увімкн." : "вимкн."}`;
+  redrawAll();
+});
+document.getElementById('hypToggleFoci').addEventListener('click', ()=>{
+  hypState.foci = !hypState.foci;
+  document.getElementById('hypToggleFoci').textContent = `Фокуси: ${hypState.foci ? "увімкн." : "вимкн."}`;
+  redrawAll();
+});
+document.getElementById('hypScale').addEventListener('input', e=>{
+  hypState.scale = parseFloat(e.target.value);
+  redrawAll();
+});
+
+/* ================================
+   Parabola controls
+================================ */
+let parState = {p:4, scale:16, showFD:true, orient:"right"};
+document.getElementById('parP').addEventListener('input', e=>{
+  parState.p = parseFloat(e.target.value);
+  document.getElementById('parPVal').innerHTML = `<strong>${parState.p.toFixed(1)}</strong>`;
+  redrawAll();
+});
+document.getElementById('parScale').addEventListener('input', e=>{
+  parState.scale = parseFloat(e.target.value);
+  redrawAll();
+});
+document.getElementById('parToggleFD').addEventListener('click', ()=>{
+  parState.showFD = !parState.showFD;
+  document.getElementById('parToggleFD').textContent = `Фокус/директриса: ${parState.showFD ? "увімкн." : "вимкн."}`;
+  redrawAll();
+});
+document.getElementById('parOrient').addEventListener('change', e=>{
+  parState.orient = e.target.value;
+  redrawAll();
+});
+document.getElementById('parReset').addEventListener('click', ()=>{
+  parState = {p:4, scale:16, showFD:true, orient:"right"};
+  document.getElementById('parP').value = parState.p;
+  document.getElementById('parScale').value = parState.scale;
+  document.getElementById('parPVal').innerHTML = `<strong>${parState.p.toFixed(1)}</strong>`;
+  document.getElementById('parToggleFD').textContent = `Фокус/директриса: увімкн.`;
+  document.getElementById('parOrient').value = parState.orient;
+  redrawAll();
+});
+
+/* ================================
+   Elements controls + drag chord points
+================================ */
+let elState = {a:8, b:5, axes:true, chord:true, diameter:false, scale:16};
+let chordPts = [{t: 0.6}, {t: 2.4}]; // parameters (angles) on ellipse
+
+function ellipsePoint(a,b,t){ return [a*Math.cos(t), b*Math.sin(t)]; }
+
+document.getElementById('elA').addEventListener('input', e=>{
+  elState.a = parseFloat(e.target.value);
+  document.getElementById('elAVal').innerHTML = `<strong>${elState.a.toFixed(1)}</strong>`;
+  redrawAll();
+});
+document.getElementById('elB').addEventListener('input', e=>{
+  elState.b = parseFloat(e.target.value);
+  document.getElementById('elBVal').innerHTML = `<strong>${elState.b.toFixed(1)}</strong>`;
+  redrawAll();
+});
+document.getElementById('elToggleAxes').addEventListener('click', ()=>{
+  elState.axes = !elState.axes;
+  document.getElementById('elToggleAxes').textContent = `Напівосі: ${elState.axes ? "увімкн." : "вимкн."}`;
+  redrawAll();
+});
+document.getElementById('elToggleChord').addEventListener('click', ()=>{
+  elState.chord = !elState.chord;
+  document.getElementById('elToggleChord').textContent = `Хорда: ${elState.chord ? "увімкн." : "вимкн."}`;
+  redrawAll();
+});
+document.getElementById('elToggleDiameter').addEventListener('click', ()=>{
+  elState.diameter = !elState.diameter;
+  document.getElementById('elToggleDiameter').textContent = `Діаметр: ${elState.diameter ? "увімкн." : "вимкн."}`;
+  redrawAll();
+});
+document.getElementById('elScale').addEventListener('input', e=>{
+  elState.scale = parseFloat(e.target.value);
+  redrawAll();
+});
+
+// dragging chord points
+(function setupChordDrag(){
+  const cv = document.getElementById('cv-elements');
+  let dragging = -1;
+
+  function hitTest(mx,my){
+    const plot = plots.elements;
+    const [x,y] = plot.screenToWorld(mx,my);
+    const p0 = ellipsePoint(elState.a, elState.b, chordPts[0].t);
+    const p1 = ellipsePoint(elState.a, elState.b, chordPts[1].t);
+    const d0 = (x-p0[0])**2 + (y-p0[1])**2;
+    const d1 = (x-p1[0])**2 + (y-p1[1])**2;
+    const thr = (0.6)**2;
+    if (d0 < thr) return 0;
+    if (d1 < thr) return 1;
+    return -1;
+  }
+
+  cv.addEventListener('pointerdown', (e)=>{
+    const rect = cv.getBoundingClientRect();
+    const mx = (e.clientX-rect.left)*(window.devicePixelRatio||1);
+    const my = (e.clientY-rect.top)*(window.devicePixelRatio||1);
+    dragging = hitTest(mx,my);
+    if (dragging>=0){
+      cv.setPointerCapture(e.pointerId);
+    }
+  });
+
+  cv.addEventListener('pointermove', (e)=>{
+    if (dragging<0) return;
+    const rect = cv.getBoundingClientRect();
+    const mx = (e.clientX-rect.left)*(window.devicePixelRatio||1);
+    const my = (e.clientY-rect.top)*(window.devicePixelRatio||1);
+    const plot = plots.elements;
+    const [x,y] = plot.screenToWorld(mx,my);
+    // project to ellipse parameter angle by atan2(y/b, x/a)
+    const t = Math.atan2(y/(elState.b||1e-9), x/(elState.a||1e-9));
+    chordPts[dragging].t = t;
+    redrawAll();
+  });
+
+  cv.addEventListener('pointerup', (e)=>{ dragging=-1; });
+  cv.addEventListener('pointercancel', ()=>{ dragging=-1; });
+})();
+
+/* ================================
+   Optics controls
+================================ */
+let opState = {mode:"parabola", rays:9, p:5, a:9, b:5.5, scale:20, showCone:false};
+
+document.getElementById('opMode').addEventListener('change', e=>{
+  opState.mode = e.target.value;
+  document.getElementById('opParControls').style.display = (opState.mode==="parabola") ? "" : "none";
+  document.getElementById('opEllControls').style.display = (opState.mode==="ellipse") ? "" : "none";
+  redrawAll();
+});
+document.getElementById('opRays').addEventListener('input', e=>{
+  opState.rays = parseInt(e.target.value,10);
+  document.getElementById('opRaysVal').innerHTML = `<strong>${opState.rays}</strong>`;
+  redrawAll();
+});
+document.getElementById('opP').addEventListener('input', e=>{
+  opState.p = parseFloat(e.target.value);
+  document.getElementById('opPVal').innerHTML = `<strong>${opState.p.toFixed(1)}</strong>`;
+  redrawAll();
+});
+document.getElementById('opA').addEventListener('input', e=>{
+  opState.a = parseFloat(e.target.value);
+  redrawAll();
+});
+document.getElementById('opB').addEventListener('input', e=>{
+  opState.b = parseFloat(e.target.value);
+  redrawAll();
+});
+document.getElementById('opScale').addEventListener('input', e=>{
+  opState.scale = parseFloat(e.target.value);
+  redrawAll();
+});
+document.getElementById('opToggleCone').addEventListener('click', ()=>{
+  opState.showCone = !opState.showCone;
+  document.getElementById('opToggleCone').textContent = `Показати конус: ${opState.showCone ? "увімкн." : "вимкн."}`;
+  redrawAll();
+});
+
+/* ================================
+   General equation controls + pan/zoom
+================================ */
+let gState = {
+  A:1, B:0, C:1, D:0, E:0, F:-49,
+  scale:18,
+  panEnabled:false,
+  panX:0, panY:0
+};
+function bindNum(id, key){
+  document.getElementById(id).addEventListener('input', e=>{
+    gState[key]=parseFloat(e.target.value);
+    redrawAll();
+  });
+}
+bindNum('gA','A'); bindNum('gB','B'); bindNum('gC','C'); bindNum('gD','D'); bindNum('gE','E'); bindNum('gF','F');
+
+document.getElementById('gScale').addEventListener('input', e=>{
+  gState.scale = parseFloat(e.target.value);
+  redrawAll();
+});
+document.getElementById('gTogglePan').addEventListener('click', ()=>{
+  gState.panEnabled = !gState.panEnabled;
+  document.getElementById('gTogglePan').textContent = `Панорамування: ${gState.panEnabled ? "увімкн." : "вимкн."}`;
+});
+document.getElementById('gZoomIn').addEventListener('click', ()=>{
+  gState.scale = Math.max(6, gState.scale-2);
+  document.getElementById('gScale').value = gState.scale;
+  redrawAll();
+});
+document.getElementById('gZoomOut').addEventListener('click', ()=>{
+  gState.scale = Math.min(50, gState.scale+2);
+  document.getElementById('gScale').value = gState.scale;
+  redrawAll();
+});
+document.getElementById('gReset').addEventListener('click', ()=>{
+  gState = {A:1,B:0,C:1,D:0,E:0,F:-49,scale:18,panEnabled:false,panX:0,panY:0};
+  document.getElementById('gA').value=gState.A;
+  document.getElementById('gB').value=gState.B;
+  document.getElementById('gC').value=gState.C;
+  document.getElementById('gD').value=gState.D;
+  document.getElementById('gE').value=gState.E;
+  document.getElementById('gF').value=gState.F;
+  document.getElementById('gScale').value=gState.scale;
+  document.getElementById('gTogglePan').textContent = `Панорамування: вимкн.`;
+  redrawAll();
+});
+
+document.querySelectorAll('[data-preset]').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    const p = btn.dataset.preset;
+    if (p==="circle"){ Object.assign(gState,{A:1,B:0,C:1,D:0,E:0,F:-49}); }
+    if (p==="ellipse"){ Object.assign(gState,{A:1/81,B:0,C:1/25,D:0,E:0,F:-1}); } // x^2/81 + y^2/25 = 1
+    if (p==="hyperbola"){ Object.assign(gState,{A:1/25,B:0,C:-1/9,D:0,E:0,F:-1}); } // x^2/25 - y^2/9 = 1
+    if (p==="parabola"){ Object.assign(gState,{A:0,B:0,C:1,D:-8,E:0,F:0}); } // y^2 - 8x = 0
+    if (p==="rotated"){ Object.assign(gState,{A:3,B:4,C:3,D:0,E:0,F:-48}); } // rotated ellipse-like
+    document.getElementById('gA').value=gState.A;
+    document.getElementById('gB').value=gState.B;
+    document.getElementById('gC').value=gState.C;
+    document.getElementById('gD').value=gState.D;
+    document.getElementById('gE').value=gState.E;
+    document.getElementById('gF').value=gState.F;
+    redrawAll();
+  });
+});
+
+// pan on general canvas
+(function setupGeneralPan(){
+  const cv = document.getElementById('cv-general');
+  let dragging=false;
+  let last=null;
+
+  cv.addEventListener('pointerdown', (e)=>{
+    if (!gState.panEnabled) return;
+    dragging=true;
+    const rect=cv.getBoundingClientRect();
+    last=[(e.clientX-rect.left)*(window.devicePixelRatio||1),(e.clientY-rect.top)*(window.devicePixelRatio||1)];
+    cv.setPointerCapture(e.pointerId);
+  });
+  cv.addEventListener('pointermove', (e)=>{
+    if (!dragging) return;
+    const rect=cv.getBoundingClientRect();
+    const cur=[(e.clientX-rect.left)*(window.devicePixelRatio||1),(e.clientY-rect.top)*(window.devicePixelRatio||1)];
+    const plot=plots.general;
+    // convert screen delta to world delta
+    const [x0,y0]=plot.screenToWorld(last[0], last[1]);
+    const [x1,y1]=plot.screenToWorld(cur[0], cur[1]);
+    const dx=x0-x1, dy=y0-y1;
+    gState.panX += dx;
+    gState.panY += dy;
+    last=cur;
+    redrawAll();
+  });
+  cv.addEventListener('pointerup', ()=>{dragging=false;});
+  cv.addEventListener('pointercancel', ()=>{dragging=false;});
+})();
+
+/* ================================
+   Redraw
+================================ */
+function redrawAll(){
+  // Circle
+  {
+    const p = plots.circle;
+    p.state.scaleUnits = circleState.scale;
+    p.state.showGrid = circleState.grid;
+    p.state.showLabels = circleState.labels;
+    p.state.panX = 0; p.state.panY = 0;
+    drawCircle(p, circleState.R);
+  }
+
+  // Ellipse
+  {
+    const p = plots.ellipse;
+    p.state.scaleUnits = ellState.scale;
+    p.state.showGrid = true;
+    p.state.showLabels = true;
+    p.state.panX = 0; p.state.panY = 0;
+    const info = drawEllipse(p, ellState.a, ellState.b, ellState.foci);
+    document.getElementById('ellC').textContent = info.c.toFixed(3);
+    document.getElementById('ellArea').textContent = (Math.PI*ellState.a*ellState.b).toFixed(3);
+  }
+
+  // Hyperbola
+  {
+    const p = plots.hyperbola;
+    p.state.scaleUnits = hypState.scale;
+    p.state.showGrid = true;
+    p.state.showLabels = true;
+    p.state.panX = 0; p.state.panY = 0;
+    const info = drawHyperbola(p, hypState.a, hypState.b, hypState.asy, hypState.foci);
+    document.getElementById('hypC').textContent = info.c.toFixed(3);
+  }
+
+  // Parabola
+  {
+    const p = plots.parabola;
+    p.state.scaleUnits = parState.scale;
+    p.state.showGrid = true;
+    p.state.showLabels = true;
+    p.state.panX = 0; p.state.panY = 0;
+    drawParabola(p, parState.p, parState.orient, parState.showFD);
+  }
+
+  // Elements
+  {
+    const p = plots.elements;
+    p.state.scaleUnits = elState.scale;
+    p.state.showGrid = true;
+    p.state.showLabels = true;
+    p.state.panX = 0; p.state.panY = 0;
+
+    p.clear(); p.drawGrid();
+    // ellipse
+    const pts=[];
+    for(let i=0;i<=360;i++){
+      const t=i*Math.PI/180;
+      pts.push([elState.a*Math.cos(t), elState.b*Math.sin(t)]);
+    }
+    p.polyline(pts, "rgba(37,99,235,0.95)", 2.2);
+
+    if (elState.axes){
+      p.line(-elState.a,0,elState.a,0,"rgba(15,23,42,0.28)",1.6);
+      p.line(0,-elState.b,0,elState.b,"rgba(15,23,42,0.28)",1.6);
+      p.text(elState.a,0,"a"); p.text(0,elState.b,"b");
+    }
+
+    const P0 = ellipsePoint(elState.a, elState.b, chordPts[0].t);
+    const P1 = ellipsePoint(elState.a, elState.b, chordPts[1].t);
+    p.point(P0[0],P0[1],4,"rgba(22,163,74,0.95)");
+    p.point(P1[0],P1[1],4,"rgba(22,163,74,0.95)");
+
+    if (elState.chord){
+      p.line(P0[0],P0[1],P1[0],P1[1],"rgba(13,148,136,0.55)",2);
+      p.text((P0[0]+P1[0])/2,(P0[1]+P1[1])/2,"хорда");
+    }
+
+    if (elState.diameter){
+      // diameter parallel to chord passing through origin: same direction vector
+      const vx = P1[0]-P0[0], vy = P1[1]-P0[1];
+      const L = p.state.scaleUnits*1.1;
+      const norm = Math.hypot(vx,vy)||1;
+      const ux = vx/norm, uy = vy/norm;
+      p.line(-L*ux, -L*uy, L*ux, L*uy, "rgba(255,209,102,0.55)", 2);
+      p.text(L*ux, L*uy, "діаметр");
+    }
+
+    const chordLen = Math.hypot(P1[0]-P0[0], P1[1]-P0[1]);
+    document.getElementById('chordLen').textContent = chordLen.toFixed(3);
+    document.getElementById('elArea').textContent = (Math.PI*elState.a*elState.b).toFixed(3);
+  }
+
+  // Optics
+  {
+    const p = plots.optics;
+    p.state.scaleUnits = opState.scale;
+    p.state.showGrid = true;
+    p.state.showLabels = true;
+    p.state.panX = 0; p.state.panY = 0;
+
+    p.clear(); p.drawGrid();
+
+    const ctx = p.state.ctx;
+    // optional "double cone" schematic in corner
+    if (opState.showCone){
+      ctx.save();
+      ctx.globalAlpha = 0.9;
+      ctx.fillStyle = "rgba(15,23,42,0.08)";
+      ctx.strokeStyle = "rgba(15,23,42,0.24)";
+      ctx.lineWidth = 1.6*(window.devicePixelRatio||1);
+
+      const pad = 18*(window.devicePixelRatio||1);
+      const W = 170*(window.devicePixelRatio||1);
+      const H = 140*(window.devicePixelRatio||1);
+      const x0 = pad, y0 = pad;
+
+      ctx.beginPath();
+      ctx.roundRect(x0, y0, W, H, 16*(window.devicePixelRatio||1));
+      ctx.fill(); ctx.stroke();
+
+      // draw cone
+      const cx = x0 + W*0.5, cy = y0 + H*0.55;
+      ctx.beginPath();
+      ctx.moveTo(cx, y0+12*(window.devicePixelRatio||1));
+      ctx.lineTo(x0+W*0.25, cy);
+      ctx.lineTo(cx, y0+H-12*(window.devicePixelRatio||1));
+      ctx.lineTo(x0+W*0.75, cy);
+      ctx.closePath();
+      ctx.stroke();
+
+      // plane
+      ctx.strokeStyle = "rgba(37,99,235,0.55)";
+      ctx.beginPath();
+      ctx.moveTo(x0+W*0.15, cy);
+      ctx.lineTo(x0+W*0.85, cy);
+      ctx.stroke();
+
+      ctx.fillStyle="rgba(51,65,85,0.78)";
+      ctx.font = `${11*(window.devicePixelRatio||1)}px system-ui`;
+      ctx.fillText("Подвійний конус", x0+12*(window.devicePixelRatio||1), y0+H-12*(window.devicePixelRatio||1));
+      ctx.restore();
+    }
+
+    // rays
+    const raysN = opState.rays;
+    if (opState.mode==="parabola"){
+      // draw parabola opening right
+      drawParabola(p, opState.p, "right", true);
+      // overlay rays: parallel to x-axis hitting parabola, then reflected to focus (demo)
+      const focus = [opState.p/2, 0];
+
+      for (let i=0;i<raysN;i++){
+        const y = -opState.p*0.9 + (2*opState.p*0.9)*i/(raysN-1);
+        // choose intersection point approximately: y^2 = 2px -> x = y^2/(2p)
+        const xHit = (y*y)/(2*opState.p);
+        // incoming segment
+        p.line(-p.state.scaleUnits, y, xHit, y, "rgba(15,23,42,0.18)", 1.6);
+        // "reflected" segment to focus (demo line)
+        p.line(xHit, y, focus[0], focus[1], "rgba(13,148,136,0.35)", 1.6);
+      }
+      p.point(focus[0],focus[1],4,"rgba(22,163,74,0.95)");
+      p.text(focus[0],focus[1],"F");
+    } else {
+      // ellipse mode
+      const a = opState.a, b = opState.b;
+      const info = drawEllipse(p, a, b, true);
+      // foci positions (assuming major axis along x when a>=b)
+      let F1, F2;
+      if (a>=b){
+        const c = Math.sqrt(Math.max(0, a*a - b*b));
+        F1=[-c,0]; F2=[c,0];
+      } else {
+        const c = Math.sqrt(Math.max(0, b*b - a*a));
+        F1=[0,-c]; F2=[0,c];
+      }
+      // pick points on ellipse and show segments F1->P->F2 (optical property concept)
+      for (let i=0;i<raysN;i++){
+        const t = (i/(raysN))*Math.PI*2;
+        const P=[a*Math.cos(t), b*Math.sin(t)];
+        p.line(F1[0],F1[1],P[0],P[1],"rgba(15,23,42,0.24)",1.6);
+        p.line(P[0],P[1],F2[0],F2[1],"rgba(13,148,136,0.30)",1.6);
+      }
+      p.point(F1[0],F1[1],4,"rgba(22,163,74,0.95)");
+      p.point(F2[0],F2[1],4,"rgba(22,163,74,0.95)");
+      p.text(F1[0],F1[1],"F₁"); p.text(F2[0],F2[1],"F₂");
+    }
+  }
+
+  // General equation
+  {
+    const p = plots.general;
+    p.state.scaleUnits = gState.scale;
+    p.state.showGrid = true;
+    p.state.showLabels = true;
+    p.state.panX = gState.panX;
+    p.state.panY = gState.panY;
+
+    const A=gState.A, B=gState.B, C=gState.C, D=gState.D, E=gState.E, F=gState.F;
+
+    const cls = classifyConic(A,B,C,D,E,F);
+    const thetaDeg = cls.theta*180/Math.PI;
+
+    // Use implicit function f(x,y)
+    const f = (x,y) => A*x*x + B*x*y + C*y*y + D*x + E*y + F;
+    drawImplicit(p, f);
+
+    // show a "rotation suggestion"
+    const rot = rotateCoeffs(A,B,C,D,E,F, cls.theta);
+    const B2 = rot.B;
+
+    const info = `
+      Тип за дискримінантом: <b>${cls.type}</b><br/>
+      \\(\\Delta=B^2-4AC=\\) <b>${cls.delta.toFixed(3)}</b><br/>
+      Кут повороту для усунення \\(xy\\): \\(\\theta\\approx\\) <b>${thetaDeg.toFixed(2)}°</b><br/>
+      Після повороту: \\(B'\\approx\\) <b>${B2.toFixed(4)}</b> (чим ближче до 0 — тим краще)<br/>
+      Рівняння: \\(${A.toFixed(3)}x^2 + ${B.toFixed(3)}xy + ${C.toFixed(3)}y^2 + ${D.toFixed(3)}x + ${E.toFixed(3)}y + ${F.toFixed(3)}=0\\)
+    `;
+    const el = document.getElementById('genInfo');
+    el.innerHTML = info;
+    // re-typeset math
+    if (window.MathJax && window.MathJax.typesetPromise){
+      MathJax.typesetPromise([el]).catch(()=>{});
+    }
+  }
+}
+
+/* ================================
+   First render + responsiveness
+================================ */
+function refreshNumbers(){
+  document.getElementById('circleRVal').innerHTML = `<strong>${circleState.R.toFixed(1)}</strong>`;
+  document.getElementById('circleScaleVal').innerHTML = `<strong>${circleState.scale}</strong>`;
+  document.getElementById('ellAVal').innerHTML = `<strong>${ellState.a.toFixed(1)}</strong>`;
+  document.getElementById('ellBVal').innerHTML = `<strong>${ellState.b.toFixed(1)}</strong>`;
+  document.getElementById('hypAVal').innerHTML = `<strong>${hypState.a.toFixed(1)}</strong>`;
+  document.getElementById('hypBVal').innerHTML = `<strong>${hypState.b.toFixed(1)}</strong>`;
+  document.getElementById('parPVal').innerHTML = `<strong>${parState.p.toFixed(1)}</strong>`;
+  document.getElementById('elAVal').innerHTML = `<strong>${elState.a.toFixed(1)}</strong>`;
+  document.getElementById('elBVal').innerHTML = `<strong>${elState.b.toFixed(1)}</strong>`;
+  document.getElementById('opRaysVal').innerHTML = `<strong>${opState.rays}</strong>`;
+  document.getElementById('opPVal').innerHTML = `<strong>${opState.p.toFixed(1)}</strong>`;
+}
+refreshNumbers();
+redrawAll();
+
+window.addEventListener('resize', () => redrawAll());
+</script>
+
+<script>
+(function(){
+  const data={
+    'sec-circle':[
+      ['Що досліджуємо','Радіус і масштаб','Коло показує залежність розміру фігури від параметра R.'],
+      ['Ключова ідея','Усі точки рівновіддалені','Відстань від центра до будь-якої точки кола однакова.'],
+      ['Практично','Змінюйте R','Порівнюйте площу, діаметр і положення точок на координатній сітці.']
+    ],
+    'sec-ellipse':[
+      ['Що досліджуємо','Напівосі a та b','Зміна напівосей демонструє витягнутість і форму еліпса.'],
+      ['Ключова ідея','Фокуси та ексцентриситет','Фокуси допомагають пояснити геометричну природу еліпса.'],
+      ['Практично','Порівняйте a і b','Коли a=b, еліпс переходить у коло.']
+    ],
+    'sec-hyperbola':[
+      ['Що досліджуємо','Гілки та асимптоти','Параметри a і b змінюють нахил асимптот і форму гілок.'],
+      ['Ключова ідея','Різниця відстаней','Гіпербола пов’язана зі сталою різницею відстаней до фокусів.'],
+      ['Практично','Увімкніть фокуси','Порівняйте вершини, фокуси та асимптоти.']
+    ],
+    'sec-parabola':[
+      ['Що досліджуємо','Параметр p','Параметр визначає “ширину” параболи та положення фокуса.'],
+      ['Ключова ідея','Фокус і директриса','Кожна точка параболи рівновіддалена від фокуса та директриси.'],
+      ['Практично','Змініть орієнтацію','Перевірте, як рівняння читається при різному напрямі відкриття.']
+    ],
+    'sec-elements':[
+      ['Що досліджуємо','Елементи кривих','Напівосі, хорда й діаметр допомагають пояснити будову фігури.'],
+      ['Ключова ідея','Геометричні зв’язки','Точки хорди можна переміщувати, щоб бачити зміну довжини.'],
+      ['Практично','Працюйте мишкою','Перетягуйте точки хорди без зміни основної логіки сайту.']
+    ],
+    'sec-optics':[
+      ['Що досліджуємо','Оптичні властивості','Промені демонструють зв’язок геометрії з фізичними моделями.'],
+      ['Ключова ідея','Фокусування','Парабола збирає паралельні промені у фокусі.'],
+      ['Практично','Змініть режим','Порівняйте параболу та еліпс у демонстрації променів.']
+    ],
+    'sec-general':[
+      ['Що досліджуємо','Загальне рівняння','Коефіцієнти визначають тип кривої та її положення.'],
+      ['Ключова ідея','Класифікація','Дискримінант допомагає відрізнити еліпс, параболу й гіперболу.'],
+      ['Практично','Спробуйте пресети','Швидкі приклади показують різні випадки без ручного введення.']
+    ]
+  };
+  document.querySelectorAll('.section').forEach(section=>{
+    if(section.querySelector('.section-meta')) return;
+    const items=data[section.id];
+    if(!items) return;
+    const meta=document.createElement('div');
+    meta.className='section-meta';
+    meta.innerHTML=items.map((it,i)=>`<div class="guide-card" style="--guide-color:${['var(--blue)','var(--green)','var(--orange)'][i]}"><div class="guide-label">${it[0]}</div><strong>${it[1]}</strong><p>${it[2]}</p></div>`).join('');
+    const grid=section.querySelector('.grid');
+    section.insertBefore(meta,grid);
+  });
+
+  document.querySelectorAll('canvas').forEach(cv=>{
+    if(cv.nextElementSibling && cv.nextElementSibling.classList.contains('canvas-note')) return;
+    const note=document.createElement('div');
+    note.className='canvas-note';
+    note.innerHTML='<span>Працюйте з параметрами праворуч — графік оновлюється автоматично.</span><span class="legend-mini"><span class="legend-item"><span class="legend-dot"></span>Крива</span><span class="legend-item"><span class="legend-dot green"></span>Фокуси / точки</span><span class="legend-item"><span class="legend-dot orange"></span>Вершини / межі</span><span class="legend-item"><span class="legend-dot gray"></span>Осі / допоміжні лінії</span></span>';
+    cv.insertAdjacentElement('afterend',note);
+  });
+
+  const tips={
+    'circleR':'Радіус R керує розміром кола.',
+    'circleScale':'Масштаб змінює оглядову область полотна.',
+    'ellA':'Велика піввісь впливає на горизонтальну витягнутість.',
+    'ellB':'Мала піввісь впливає на вертикальну витягнутість.',
+    'hypA':'Параметр a задає положення вершин гіперболи.',
+    'hypB':'Параметр b впливає на нахил асимптот.',
+    'parP':'Параметр p визначає розкриття параболи.',
+    'opRays':'Кількість променів робить демонстрацію детальнішою.',
+    'gScale':'Масштаб допомагає розглянути неявну криву.'
+  };
+  Object.entries(tips).forEach(([id,text])=>{
+    const el=document.getElementById(id);
+    if(!el) return;
+    const ctrl=el.closest('.ctrl');
+    if(ctrl && !ctrl.querySelector('.range-caption')){
+      const cap=document.createElement('div');
+      cap.className='range-caption';
+      cap.innerHTML=`<span>${text}</span>`;
+      ctrl.appendChild(cap);
+    }
+  });
+
+  document.querySelectorAll('.footer').forEach(f=>{
+    if(f.dataset.upgraded) return;
+    f.dataset.upgraded='1';
+    f.innerHTML='<strong>Навчальна підказка:</strong> '+f.innerHTML;
+  });
+})();
+</script>
+
+</body>
+</html>
